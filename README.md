@@ -1,1 +1,1 @@
-# Multidimensional_Knapsack_Problem_Genetic_Algorithm
+# Multidimensional 0-1 Knapsack Problem Genetic Algorithm
