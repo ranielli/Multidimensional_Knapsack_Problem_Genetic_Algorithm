@@ -1,5 +1,5 @@
 import random
-
+from operator import itemgetter
 
 def start_problem_of_file(file_name):
 
@@ -58,21 +58,6 @@ def generate_population(size, chromosomes):
             i += 1
     return population
 
-def generate_population_fake(size, chromosomes):
-    population = []
-    i = 0
-    while (i < size):
-        j = 0
-        individual = []
-        while (j < chromosomes):
-            chromosome = random.randint(0, 1)
-            individual.append(chromosome)
-            j += 1
-        if individual not in population:
-            population.append(individual)
-            i += 1
-    return population
-
 def evaluation(population,itens_benefits_space):
     eval = []
     
@@ -98,7 +83,7 @@ def evaluation_order(population,itens_benefits_space):
                 value_benefits += int(itens_benefits_space[0][c])
         # list with individual and eval                        
         eval.append([population[i],value_benefits])
-        from operator import itemgetter
+        
 
     return sorted(eval, key=itemgetter(1))
 
@@ -125,16 +110,20 @@ def evaluation_valid(population, items_benefits_space,dimension):
             if not((space_valid[0] > int(constraints[res][0])) and (space_valid[1] > int(constraints[res][1])) and (space_valid[2] > int(constraints[res][2])) and 
             (space_valid[3] > int(constraints[res][3])) and (space_valid[4] > int(constraints[res][4]))):                
                 eval_valid.append([population[i],value_benefits])
-    return eval_valid
+    return sorted(eval_valid, key=itemgetter(1))
 
 def select_roulette(pop_order):
     parents = []
     fitness = []
     for i in range(len(pop_order)):
         fitness.append(pop_order[i][1])
-    for i in range(len(pop_order)):
+    i=0
+    while i < len(pop_order):
         father = random.choices(pop_order, fitness, k=1)
-        parents.append(father[0][0])  
+        # não permitir repetir
+        if father[0][0] not in parents:
+            parents.append(father[0][0])
+            i += 1  
 
     return parents
 
@@ -184,7 +173,7 @@ if __name__== "__main__":
     print('itens_benefits_space:',len(items_benefits_space))
 
     size_population = 100
-    interactions = 1000
+    interactions = 100
     interaction = 0
     problems = int(problem)
     
@@ -198,7 +187,7 @@ if __name__== "__main__":
         # print('tamanho ', len(eval_valid))
         # if len(eval_valid) > 0:
         #     print('Population valid INIT :' , eval_valid)
-
+    valids = []
     for p in range(problems):
         print('##Problem number## : ', p+1)
         print('#constraints_space:', constraints[p])
@@ -212,7 +201,6 @@ if __name__== "__main__":
         else:
             print('individual NOT valid INIT :' , eval_valid)
 
-        valids = []
         while interaction < interactions:
             pop_old = pop      
             eval = evaluation_order(pop,items_benefits_space[p])
@@ -234,11 +222,13 @@ if __name__== "__main__":
             
             eval_valid  = evaluation_valid(pop,items_benefits_space[p],int(item_dimension_best_score[p][1]))
             if len(eval_valid) > 0:
-                valids.extend(eval_valid)
+                print('valids',eval_valid)
+                valids.append(eval_valid)
             
             interaction += 1
             
-        print("Valids:",valids)
+        
+    print("Valids:",valids)
        
 
     
